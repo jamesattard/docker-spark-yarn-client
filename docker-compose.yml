@@ -1,0 +1,33 @@
+---
+version: '3'
+
+services:
+  proxy:
+    image: jwilder/nginx-proxy
+    ports:
+      - 80:80
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    networks:
+      - proxy
+
+  spark-yarn-client:
+    build: .
+    environment:
+      - VIRTUAL_HOST=spark.localhost
+      - VIRTUAL_PORT=4040
+    volumes:
+      - ./hadoop-conf:/spark/spark-2.1.1-bin-hadoop2.7/hadoop-conf
+    ports:
+      - 4040:4040
+      - 9099:9099
+    networks:
+      - proxy
+    # tty: true
+
+networks:
+  proxy:
+    driver: bridge
+
+volumes:
+  hadoop-conf:
